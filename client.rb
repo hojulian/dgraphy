@@ -13,7 +13,8 @@ class Client
     req.body = schema
 
     res = @client.request(req)
-    res.body.dig(:data, :code).equal? 'Success'
+    body = JSON.parse(res.body, symbolize_names: true)
+    body.dig(:data, :code).equal? 'Success'
   end
 
   def query(query: nil, timeout: 10, raw: true)
@@ -38,7 +39,17 @@ class Client
     req.body = query
 
     res = @client.request(req)
+    body = JSON.parse(res.body, symbolize_names: true)
+    body.dig(:data, :code).equal? 'Success'
+  end
 
-    res.body.dig(:data, :code).equal? 'Success'
+  def drop_all
+    req = Net::HTTP::Post.new('/alter')
+    req['accept'] = 'application/json'
+    req.body = '{"drop_all": true}'
+
+    res = @client.request(req)
+    body = JSON.parse(res.body, symbolize_names: true)
+    body.dig(:data, :code).equal? 'Success'
   end
 end

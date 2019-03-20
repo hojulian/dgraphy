@@ -24,4 +24,8 @@ class Dgraph
 
     @client.mutate(query: query, timeout: timeout)
   end
+
+  def drop_all
+    @client.drop_all
+  end
 end
