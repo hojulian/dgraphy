@@ -1,4 +1,5 @@
-require_relative 'client'
+require_relative 'dgraphy/version'
+require_relative 'dgraphy/client'
 
 class Dgraph
   def initialize(addr, port)
