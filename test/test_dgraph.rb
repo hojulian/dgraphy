@@ -5,7 +5,7 @@ require_relative '../lib/dgraphy/schema'
 
 class TestDgraph < Minitest::Test
   def test_create_schema
-    client = Dgraph.new("ec2-18-220-195-165.us-east-2.compute.amazonaws.com", 8080)
+    client = Dgraph.new(host: "ec2-18-220-195-165.us-east-2.compute.amazonaws.com", port: 8080)
 
     schema = 'Testschema: string @index(exact) .'
     assert client.alter(schema: schema, timeout: 30)
@@ -20,7 +20,7 @@ class TestDgraph < Minitest::Test
   end
 
   def test_query
-    client = Dgraph.new("ec2-18-220-195-165.us-east-2.compute.amazonaws.com", 8080)
+    client = Dgraph.new(host: "ec2-18-220-195-165.us-east-2.compute.amazonaws.com", port: 8080)
     query = '{ students(func: eq(Type, "Student")) { uid } }'
 
     body = client.query(query: query, timeout: 30)

@@ -2,10 +2,10 @@ require_relative 'dgraphy/version'
 require_relative 'dgraphy/client'
 
 class Dgraph
-  def initialize(addr, port)
+  def initialize(options = {})
     raise 'No address provided in constructor' unless addr
 
-    @client = Client.new(addr, port)
+    @client = Client.new(options[:host], options[:port])
   end
 
   def alter(schema: nil, timeout: 10)
