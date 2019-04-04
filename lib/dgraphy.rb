@@ -1,9 +1,6 @@
-require_relative 'dgraphy/version'
-require_relative 'dgraphy/client'
-
-class Dgraph
+class Dgraphy
   def initialize(options = {})
-    raise 'No address provided in constructor' unless addr
+    raise 'No address provided in constructor' unless options[:host]
 
     @client = Client.new(options[:host], options[:port])
   end

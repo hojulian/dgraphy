@@ -1,3 +1,3 @@
-module Dgraphy
+class Dgraphy
   VERSION = "0.1.0"
 end
