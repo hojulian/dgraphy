@@ -1,29 +1,4 @@
-class Dgraphy
-  def initialize(options = {})
-    raise 'No address provided in constructor' unless options[:host]
-
-    @client = Client.new(options[:host], options[:port])
-  end
-
-  def alter(schema: nil, timeout: 10)
-    return nil if schema.nil?
-
-    @client.alter(schema: schema, timeout: timeout)
-  end
-
-  def query(query: nil, timeout: 10, raw: true)
-    return nil if query.nil?
-
-    @client.query(query: query, timeout: timeout, raw: raw)
-  end
-
-  def mutate(query: nil, timeout: 10)
-    return nil if query.nil?
-
-    @client.mutate(query: query, timeout: timeout)
-  end
-
-  def drop_all
-    @client.drop_all
-  end
-end
+require_relative 'dgraphy/client'
+require_relative 'dgraphy/mutate_builder'
+require_relative 'dgraphy/schema'
+require_relative 'dgraphy/version'

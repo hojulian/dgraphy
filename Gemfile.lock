@@ -1,11 +1,12 @@
 PATH
   remote: .
   specs:
-    dgraphy (0.1.0)
+    dgraphy (0.2.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    httpclient (2.8.3)
     minitest (5.11.3)
     rake (10.5.0)
 
@@ -15,6 +16,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.17)
   dgraphy!
+  httpclient (~> 2.8.3)
   minitest (~> 5.0)
   rake (~> 10.0)
 

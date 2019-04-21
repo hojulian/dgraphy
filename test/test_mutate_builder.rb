@@ -1,6 +1,6 @@
 require "test_helper"
 
-require_relative '../lib/dgraphy/mutate_builder'
+require_relative '../lib/dgraphy'
 
 class MutateBuilderTest < Minitest::Test
   def test_building_mutate

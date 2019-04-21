@@ -1,57 +1,93 @@
 require 'json'
 require 'net/http'
+require 'httpclient'
 
 class Dgraphy
   class Client
-    def initialize(addr, port)
-      @client = Net::HTTP.new(addr, port)
+    def initialize(options = {})
+      pool = options[:pool] || 5
+      @host = options[:host] || '127.0.0.1'
+      @port = options[:port] || 8080
+      @clients = []
+      @async_clients = []
+      pool.times do
+        @clients << Net::HTTP.new(@host, @port)
+        @async_clients << HTTPClient.new
+      end
     end
 
-    def alter(schema: nil, timeout: 10)
+    def alter(options = {})
       req = Net::HTTP::Post.new('/alter')
       req['accept'] = 'application/json'
-      # req.continue_timeout = timeout
-      req.body = schema
+      # req.continue_timeout = options[:timeout]
+      req.body = options[:schema]
 
-      res = @client.request(req)
+      res = any_client.request(req)
+
       body = JSON.parse(res.body, symbolize_names: true)
       body.dig(:data, :code).equal? 'Success'
     end
 
-    def query(query: nil, timeout: 10, raw: true)
+    def query(options = {})
       req = Net::HTTP::Post.new('/query')
       req['accept'] = 'application/json'
-      # req.continue_timeout = timeout
-      req.body = query
+      # req.continue_timeout = options[:timeout]
+      req.body = options[:query]
 
-      res = @client.request(req)
+      res = any_client.request(req)
 
-      if raw
+      if options[:raw]
         JSON.parse(res.body, symbolize_names: true)
       else
         JSON.parse(res.body, symbolize_names: true).dig(:data)
       end
     end
 
-    def mutate(query: nil, timeout: 10)
+    def mutate(options = {})
       req = Net::HTTP::Post.new('/mutate')
       req['accept'] = 'application/json'
-      # req.continue_timeout = timeout
-      req.body = query
+      # commit immediately
+      req['X-Dgraph-CommitNow'] = true
+      req.body = options[:query]
 
-      res = @client.request(req)
+      res = any_client.request(req)
+
       body = JSON.parse(res.body, symbolize_names: true)
-      body.dig(:data, :code).equal? 'Success'
+
+      if options[:show_uids]
+        body.dig(:data, :uids)
+      else
+        body.dig(:data, :code).to_s.equal? 'Success'
+      end
+    end
+
+    def mutate_async(options = {})
+      conn = any_async_client.post_async(
+        "http://#{@host}:#{@port}/mutate",
+        header: {
+          'accept' => 'application/json',
+          'X-Dgraph-CommitNow' => true,
+        },
+        body: options[:query]
+      )
+      conn
     end
 
     def drop_all
-      req = Net::HTTP::Post.new('/alter')
-      req['accept'] = 'application/json'
-      req.body = '{"drop_all": true}'
+      alter(schema: '{"drop_all": true}')
+    end
 
-      res = @client.request(req)
-      body = JSON.parse(res.body, symbolize_names: true)
-      body.dig(:data, :code).equal? 'Success'
+    def drop_attr(options = {})
+      attr = options[:attr]
+      alter(schema: "{\"drop_attr\": \"#{attr}\"}")
+    end
+
+    def any_client
+      @clients.sample
+    end
+
+    def any_async_client
+      @async_clients.sample
     end
   end
 end
